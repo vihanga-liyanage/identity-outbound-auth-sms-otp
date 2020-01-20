@@ -73,13 +73,22 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
     @Override
     public boolean canHandle(HttpServletRequest request) {
 
+        boolean canHandle = false;
         if (log.isDebugEnabled()) {
             log.debug("Inside SMSOTPAuthenticator canHandle method and check the existence of mobile number and otp code");
+            Map<String, String[]> params = request.getParameterMap();
+            for (Map.Entry<String, String[]> param : params.entrySet()) {
+                for (String value : param.getValue()) {
+                    log.debug(param.getKey() + " : " + value);
+                }
+            }
+            canHandle = (StringUtils.isNotEmpty(request.getParameter(SMSOTPConstants.RESEND))
+                    && StringUtils.isEmpty(request.getParameter(SMSOTPConstants.CODE)))
+                    || StringUtils.isNotEmpty(request.getParameter(SMSOTPConstants.CODE))
+                    || StringUtils.isNotEmpty(request.getParameter(SMSOTPConstants.MOBILE_NUMBER));
+            log.debug("SMSOTPAuthenticator canHandle returned: " + canHandle);
         }
-        return ((StringUtils.isNotEmpty(request.getParameter(SMSOTPConstants.RESEND))
-                && StringUtils.isEmpty(request.getParameter(SMSOTPConstants.CODE)))
-                || StringUtils.isNotEmpty(request.getParameter(SMSOTPConstants.CODE))
-                || StringUtils.isNotEmpty(request.getParameter(SMSOTPConstants.MOBILE_NUMBER)));
+        return canHandle;
     }
 
     @Override

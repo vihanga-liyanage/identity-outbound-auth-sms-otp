@@ -128,12 +128,12 @@
                                               <div class="control-group">
                                                <label class="control-label" for="password">
                                                Enter the code sent to your mobile phone:<%=Encode.forHtmlContent(request.getParameter("screenvalue"))%></label>
-                                               <input type="password" id='OTPcode' name="OTPcode"
+                                               <input type="password" id='SMSOTPcode' name="SMSOTPcode"
                                                class="input-xlarge" size='30'/>
                                                <% } else { %>
                                                <div class="control-group">
                                                <label class="control-label" for="password">Enter the code sent to your mobile phone:</label>
-                                               <input type="password" id='OTPcode' name="OTPcode"
+                                               <input type="password" id='SMSOTPcode' name="SMSOTPcode"
                                                class="input-xlarge" size='30'/>
                                                <% } %>
                                              </div>
@@ -179,8 +179,8 @@
     <script type="text/javascript">
     $(document).ready(function() {
     	$('#authenticate').click(function() {
-            var OTPcode = document.getElementById("OTPcode").value;
-            if (OTPcode == "") {
+            var smsOTPcode = document.getElementById("SMSOTPcode").value;
+            if (smsOTPcode == "") {
                 document.getElementById('alertDiv').innerHTML
                 = '<div id="error-msg" class="alert alert-danger">Please enter the code!</div>';
             } else {

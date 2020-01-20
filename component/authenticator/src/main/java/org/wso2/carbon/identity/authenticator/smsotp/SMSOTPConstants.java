@@ -31,7 +31,7 @@ public class SMSOTPConstants {
     public static final int SECRET_KEY_LENGTH = 5;
     public static final int NUMBER_BASE = 2;
     public static final int NUMBER_DIGIT = 6;
-    public static final String CODE = "OTPcode";
+    public static final String CODE = "SMSOTPcode";
     public static final String MOBILE_CLAIM = "http://wso2.org/claims/mobile";
     public static final String SAVED_OTP_LIST = "http://wso2.org/claims/otpbackupcodes";
     public static final String USER_SMSOTP_DISABLED_CLAIM_URI = "http://wso2.org/claims/identity/smsotp_disabled";
