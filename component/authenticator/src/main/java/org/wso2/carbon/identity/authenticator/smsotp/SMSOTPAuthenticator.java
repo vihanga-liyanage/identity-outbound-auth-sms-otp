@@ -79,10 +79,11 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
             Map<String, String[]> params = request.getParameterMap();
             for (Map.Entry<String, String[]> param : params.entrySet()) {
                 for (String value : param.getValue()) {
-                    log.debug(param.getKey() + " : " + value);
+                    log.debug("  * " + param.getKey() + " : " + value);
                 }
             }
             canHandle = (StringUtils.isNotEmpty(request.getParameter(SMSOTPConstants.RESEND))
+                    && Boolean.parseBoolean(request.getParameter(SMSOTPConstants.RESEND))
                     && StringUtils.isEmpty(request.getParameter(SMSOTPConstants.CODE)))
                     || StringUtils.isNotEmpty(request.getParameter(SMSOTPConstants.CODE))
                     || StringUtils.isNotEmpty(request.getParameter(SMSOTPConstants.MOBILE_NUMBER));
@@ -102,13 +103,18 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
         } else if (StringUtils.isNotEmpty(request.getParameter(SMSOTPConstants.MOBILE_NUMBER))) {
             // if the request comes with MOBILE_NUMBER, it will go through this flow.
             initiateAuthenticationRequest(request, response, context);
+            log.info("DITTSUB-45: SMSOTPAuthenticator | process | request comes with MOBILE_NUMBER.");
             return AuthenticatorFlowStatus.INCOMPLETE;
         } else if (StringUtils.isEmpty(request.getParameter(SMSOTPConstants.CODE))) {
             // if the request comes with code, it will go through this flow.
+            log.info("DITTSUB-45: SMSOTPAuthenticator | process | request comes without code.");
             initiateAuthenticationRequest(request, response, context);
             if (context.getProperty(SMSOTPConstants.AUTHENTICATION)
                     .equals(SMSOTPConstants.AUTHENTICATOR_NAME)) {
                 // if the request comes with authentication is SMSOTP, it will go through this flow.
+                // set the current authenticator name
+                log.info("DITTSUB-45: SMSOTPAuthenticator | process | setting the current authenticator to: " + getName());
+                context.setCurrentAuthenticator(getName());
                 return AuthenticatorFlowStatus.INCOMPLETE;
             } else {
                 // if the request comes with authentication is basic, complete the flow.
@@ -631,11 +637,11 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
             throw new InvalidCredentialsException("Retrying to resend the OTP");
         }
         if (userToken.equals(contextToken)) {
-            if (StringUtils.isNotEmpty(context.getProperty(SMSOTPConstants.TOKEN_VALIDITY_TIME).toString())) {
+            String tokenValidityPeriod = (String) context.getProperty(SMSOTPConstants.TOKEN_VALIDITY_TIME);
+            if (StringUtils.isNotEmpty(tokenValidityPeriod)) {
                 long elapsedTokenTime = System.currentTimeMillis() - Long.parseLong(context.getProperty(SMSOTPConstants.
                         SENT_OTP_TOKEN_TIME).toString());
-                if (elapsedTokenTime <= (Long.parseLong(context.getProperty(SMSOTPConstants.TOKEN_VALIDITY_TIME).
-                        toString()) * 1000)) {
+                if (elapsedTokenTime <= (Long.parseLong(tokenValidityPeriod) * 1000)) {
                     context.setSubject(authenticatedUser);
                 } else {
                     context.setProperty(SMSOTPConstants.TOKEN_EXPIRED, SMSOTPConstants.TOKEN_EXPIRED_VALUE);
